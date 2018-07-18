@@ -9,6 +9,7 @@ from __future__ import print_function
 import simplejson
 import urllib
 import re
+import sys
 import argparse
 
 def start_calc(orig, dest, avoid=''):
@@ -22,12 +23,19 @@ def start_calc(orig, dest, avoid=''):
               &destinations=%s\
               &mode=driving\
               &avoid=%s\
-              &language=en-EN" %
+              &language=en" %
              (orig_coord, dest_coord, avoid)).split())
-    result = simplejson.load(urllib.urlopen(url))
-    distance = result['rows'][0]['elements'][0]['distance']
-    driving_time = result['rows'][0]['elements'][0]['duration']
-
+    try:
+        result = simplejson.load(urllib.urlopen(url))
+    except IOError:
+        print("Connection Error with Google Maps API!")
+        sys.exit()
+    try:
+        distance = result['rows'][0]['elements'][0]['distance']
+        driving_time = result['rows'][0]['elements'][0]['duration']
+    except:
+        print("Error! Please enter the correct coordinates or parameters!")
+        sys.exit()
     print("From: %s %s" % (result['origin_addresses'][0], orig_coord))
     print("To: %s %s" % (result['destination_addresses'][0], dest_coord))
     print("Distance: %s. (%s m.)" % (distance['text'], distance['value']))
@@ -35,13 +43,9 @@ def start_calc(orig, dest, avoid=''):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--orig', required=True)
-    parser.add_argument('--dest', required=True)
-    parser.add_argument('--avoid')
-
-    try:
-        start_calc(parser.parse_args().orig,
-                   parser.parse_args().dest,
-                   parser.parse_args().avoid)
-    except:
-        print("Please enter the correct coordinates or parameters!")
+    parser.add_argument('--orig', required=True, help='Coordinates of the starting point')
+    parser.add_argument('--dest', required=True, help='Coordinates of the finish point')
+    parser.add_argument('--avoid', help='Avoid the highway, toll, ferries, indoor')
+    start_calc(parser.parse_args().orig,
+               parser.parse_args().dest,
+               parser.parse_args().avoid)
