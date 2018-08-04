@@ -7,15 +7,26 @@ Created on Fri Jul 13 12:21:54 2018
 from __future__ import absolute_import
 from __future__ import print_function
 import simplejson
-import urllib
 import re
 import sys
 import argparse
+if sys.version[0]=="3":
+    from urllib.request import urlopen
+else:
+    from urllib import urlopen
 
-def start_calc(orig, dest, avoid, traffic_model, key):
+def status_result(result):
+    if result=="REQUEST_DENIED":
+        print("Google Answer: REQUEST_DENUED")
+        sys.exit()
+    if result=="OVER_QUERY_LIMIT":
+        print("Google Answer: OVER_QUERY_LIMIT")
+        sys.exit()
+        
+def calculate(orig, dest, avoid="", traffic_model="best_guess", api_key=""):
     if avoid:
         avoid = re.sub(r",", "|", avoid)
-    url = ''.join(str("http://maps.googleapis.com/maps/api/distancematrix/json?origins=%s\
+    url = "".join(str("https://maps.googleapis.com/maps/api/distancematrix/json?origins=%s\
               &destinations=%s\
               &mode=driving\
               &avoid=%s\
@@ -23,22 +34,34 @@ def start_calc(orig, dest, avoid, traffic_model, key):
               &traffic_model=%s\
               &departure_time=now\
               &key=%s" %
-             (orig, dest, avoid, traffic_model, key)).split())
+             (orig, dest, avoid, traffic_model, api_key)).split())
     try:
-        result = simplejson.load(urllib.urlopen(url))
+        if sys.version[0]<"3":
+            result = simplejson.load(urlopen(url))
+        else:
+            result = simplejson.load(urlopen(url))
     except IOError:
         print("Connection Error with Google Maps API!")
         sys.exit()
+    status_result(result)
     try:
         distance = result["rows"][0]["elements"][0]["distance"]
-        driving_time = result["rows"][0]["elements"][0]["duration"]
+        duration = result["rows"][0]["elements"][0]["duration"]
+        duration_in_traffic = ""
     except:
         print("Error! Please enter the correct coordinates or parameters!")
         sys.exit()
+    if "duration_in_traffic" in result["rows"][0]["elements"][0]:
+        duration_in_traffic = result["rows"][0]["elements"][0]["duration_in_traffic"]
+    print("-------------------------------")
     print("From: %s %s" % (result["origin_addresses"][0], orig))
     print("To: %s %s" % (result["destination_addresses"][0], dest))
     print("Distance: %s. (%s m.)" % (distance["text"], distance["value"]))
-    print("Driving Time: %s. (%s sec.)" % (driving_time["text"], driving_time["value"]))
+    print("Duration: %s. (%s sec.)" % (duration["text"], duration["value"]))
+    if duration_in_traffic:
+        print("Duration in traffic: %s. (%s sec.)" % (duration_in_traffic["text"],
+              duration_in_traffic["value"]))
+    return result["origin_addresses"][0], result["destination_addresses"][0], distance, duration, duration_in_traffic
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -60,7 +83,7 @@ if __name__ == "__main__":
     parser.add_argument("--key", default="", help="Your application's API key. This key\
                        identifies your application for purposes of quota\
                        management")
-    start_calc(parser.parse_args().orig,
+    calculate(parser.parse_args().orig,
                parser.parse_args().dest,
                parser.parse_args().avoid,
                parser.parse_args().traffic_model,
