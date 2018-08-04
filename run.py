@@ -58,7 +58,8 @@ if __name__ == "__main__":
                     query_results.append([i[0],i[1],travel_calc.calculate(orig=i[0], dest=i[1], api_key=key), "No"])
                     query_results.append([i[0],i[1],travel_calc.calculate(orig=i[0], dest=i[1], avoid="tolls", api_key=key), "Yes"])
                 csv_writer(data=query_results)
-                time.sleep(5)
+                time.sleep(60)
         else:
             break
+        time.sleep(5)
         
