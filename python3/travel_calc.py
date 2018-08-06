@@ -121,7 +121,7 @@ class TravelCalculate:
         content = self.__csv_reader(file_with_coord)
         query_results = []
         while True:
-            if duration > 0:
+            if duration > 0 and query_time:
                 if datetime.now() <= time_out:
                     content = self.__csv_reader(file_with_coord)
                     query_results.clear()
