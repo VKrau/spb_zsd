@@ -4,19 +4,13 @@ Created on Fri Jul 13 12:21:54 2018
 
 @author: VK
 """
-from __future__ import absolute_import
-from __future__ import print_function
 import simplejson
 import re
 import sys
 import csv
 from datetime import datetime, timedelta
 import time
-
-if sys.version[0] == "3":
-    from urllib.request import urlopen
-else:
-    from urllib import urlopen
+from urllib.request import urlopen
 
 
 class TravelCalculate:
@@ -70,7 +64,7 @@ class TravelCalculate:
             print("Google Answer: OVER_QUERY_LIMIT")
             sys.exit()
 
-    def calculate(self, orig, dest, avoid="", traffic_model="best_guess"):
+    def calculate(self, orig, dest, avoid=[], traffic_model="best_guess"):
         api_key = self.__api_key
         if avoid:
             avoid = re.sub(r",", "|", avoid)
@@ -95,8 +89,6 @@ class TravelCalculate:
         try:
             distance = result["rows"][0]["elements"][0]["distance"]
             duration = result["rows"][0]["elements"][0]["duration"]
-            print(duration)
-            print(type(duration))
             if api_key:
                 duration_in_traffic = result["rows"][0]["elements"][0]["duration_in_traffic"]
             else:

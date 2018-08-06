@@ -4,9 +4,6 @@ Created on Sat Aug  4 09:13:53 2018
 
 @author: VK
 """
-from __future__ import absolute_import
-from __future__ import print_function
-
 import travel_calc
 import argparse
 
