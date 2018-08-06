@@ -33,8 +33,6 @@ class TravelCalculate:
 
     @staticmethod
     def __csv_writer(first_run=False, data=None):
-        # with open("output.csv", "wb") as w_obj: - for Python 2
-        # This is for Python 3:
         if first_run:
             with open("output.csv", "w", newline="") as w_obj:
                 writer = csv.writer(w_obj)
@@ -44,8 +42,6 @@ class TravelCalculate:
                                  "duration(s.)", "duration", "duration_in_traffic(s.)",
                                  "duration_in_traffic", "avoid"])
         else:
-            # with open("output.csv", "ab") as w_obj: - for Python 2
-            # This is for Python 3:
             with open("output.csv", "a", newline="") as w_obj:
                 writer = csv.writer(w_obj)
                 for i in data:
@@ -92,7 +88,7 @@ class TravelCalculate:
             if api_key:
                 duration_in_traffic = result["rows"][0]["elements"][0]["duration_in_traffic"]
             else:
-                duration_in_traffic = {"text":"need api-key", "value":"need api-key"}
+                duration_in_traffic = {"text": "need api-key", "value": "need api-key"}
         except:
             print("Error! Please enter the correct coordinates or parameters!")
             sys.exit()
@@ -108,12 +104,17 @@ class TravelCalculate:
             0], distance, duration, duration_in_traffic
 
     def calculate_from_file(self, file_with_coord, avoid_options=[], query_time=[], duration=0):
-        time_out = datetime.now() + timedelta(hours=duration)
+        if duration>0:
+            time_out = datetime.now() + timedelta(hours=duration)
+        elif duration==0 and query_time:
+            time_out = datetime.now()
+            time_out = time_out.replace(hour=max(query_time), minute=1)
+            print(time_out)
         self.__csv_writer(first_run=True)
         content = self.__csv_reader(file_with_coord)
         query_results = []
         while True:
-            if duration > 0 and query_time:
+            if duration >= 0 and query_time:
                 if datetime.now() <= time_out:
                     content = self.__csv_reader(file_with_coord)
                     query_results.clear()
