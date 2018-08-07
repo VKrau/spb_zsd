@@ -74,10 +74,7 @@ class TravelCalculate:
                   &key=%s" %
                           (orig, dest, avoid, traffic_model, api_key)).split())
         try:
-            if sys.version[0] < "3":
-                result = simplejson.load(urlopen(url))
-            else:
-                result = simplejson.load(urlopen(url))
+            result = simplejson.load(urlopen(url))
         except IOError:
             print("Connection Error with Google Maps API!")
             sys.exit()
@@ -104,12 +101,13 @@ class TravelCalculate:
             0], distance, duration, duration_in_traffic
 
     def calculate_from_file(self, file_with_coord, avoid_options=[], query_time=[], duration=0):
-        if duration>0:
-            time_out = datetime.now() + timedelta(hours=duration)
-        elif duration==0 and query_time:
-            time_out = datetime.now()
-            time_out = time_out.replace(hour=max(query_time), minute=1)
-            print(time_out)
+        time_out = datetime.now()
+        if duration > 0:
+            time_out = time_out + timedelta(hours=duration)
+        elif duration == 0 and query_time:
+            if int(time.strftime("%H")) > max(query_time):
+                time_out = time_out + timedelta(days=1)
+            time_out = time_out.replace(hour=max(query_time), minute=1, second=0)
         self.__csv_writer(first_run=True)
         content = self.__csv_reader(file_with_coord)
         query_results = []
@@ -132,4 +130,4 @@ class TravelCalculate:
                         query_results.append([i[0], i[1], self.calculate(orig=i[0], dest=i[1], avoid=j), j])
                 self.__csv_writer(data=query_results)
                 break
-        time.sleep(5)
+            time.sleep(5)

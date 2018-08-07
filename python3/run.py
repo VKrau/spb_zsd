@@ -8,5 +8,5 @@ import travel_calc
 
 if __name__ == "__main__":
     runner = travel_calc.TravelCalculate()
-    runner.set_api_key("YOUR API-KEY")
+    runner.set_api_key("") # <- YOUR API-KEY
     runner.calculate_from_file("coord.csv", ["", "tolls"], [17, 18, 19], duration=8)
