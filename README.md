@@ -15,17 +15,17 @@
 	
 ## Пример вызова из командной строки (с указанием координат):
 `python cmdrunner.py --orig 59.97241,30.2133597 --dest 59.9177427,30.2103535 --avoid tolls,highways`
-# или
+#### или
 `python cmdrunner.py --file coord.csv`
 
 ## Пример вызова из командной строки (с указанием адресов или наименований точек):
 `python cmdrunner.py --orig Saint-Petersburg+Birzhevaya+14 --dest London+Ye+Olde+Chesihire+Cheese+Pub`
 
 ## Пример вызова метода:
-# Первоначально создаем экземпляр объекта:
+#### Первоначально создаем экземпляр объекта:
 `runner = travel_calc.TravelCalculate()`
 
-#Пример вызова метода с указанием файла координат будет выглядеть следующим образом:
+# Пример вызова метода с указанием файла координат будет выглядеть следующим образом:
 `runner.calculate_from_file("coord.csv", ["", "tolls"], [17, 18, 19], duration=8)`
 
 #### Где:
